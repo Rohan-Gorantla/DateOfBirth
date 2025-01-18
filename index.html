@@ -4,40 +4,130 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Date Input</title>
+    <style>
+      .date-input-container {
+        display: inline-flex;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        overflow: hidden;
+      }
+
+      .date-input-container input {
+        border: none;
+        outline: none;
+        padding: 5px;
+        text-align: center;
+        font-size: 14px;
+      }
+
+      .date-input-container input:not(:last-child) {
+        border-right: 1px solid #ccc;
+      }
+
+      .date-input-container input.error {
+        border: 1px solid red;
+      }
+
+      #mm,
+      #dd {
+        width: 40px;
+      }
+
+      #yyyy {
+        width: 60px;
+      }
+
+      .date-input-container input::placeholder {
+        color: #aaa;
+      }
+
+      #error-message {
+        color: red;
+        font-size: 12px;
+        margin-top: 5px;
+        display: none;
+      }
+    </style>
   </head>
   <body>
-    <label for="dateInput">Enter Date:</label>
-    <input
-      type="date"
-      id="dob"
-      name="dob"
-      formControlName="dob"
-      max="9999-12-31"
-      onfocus="this.blur();"
-      required
-    />
-    <span class="error-message" id="error-message"></span>
+    <label for="dob">Enter Date:</label>
+    <div class="date-input-container">
+      <input
+        type="text"
+        id="mm"
+        placeholder="MM"
+        maxlength="2"
+        oninput="moveToNext(this, 'dd')"
+        onblur="validateDate()"
+      />
+      <input
+        type="text"
+        id="dd"
+        placeholder="DD"
+        maxlength="2"
+        oninput="moveToNext(this, 'yyyy')"
+        onblur="validateDate()"
+      />
+      <input
+        type="text"
+        id="yyyy"
+        placeholder="YYYY"
+        maxlength="4"
+        oninput="validateDate()"
+      />
+    </div>
+    <div id="error-message">Invalid date. Please enter a valid date.</div>
 
     <script>
-      const dobInput = document.querySelector("#dob");
-      const errorMessage = document.querySelector("#error-message");
-
-      // Allow manual input by enabling focus on the input
-      dobInput.addEventListener("input", (event) => {
-        const value = event.target.value;
-        if (isValidDate(value)) {
-          dobInput.classList.remove("error");
-          errorMessage.textContent = "";
-        } else {
-          dobInput.classList.add("error");
-          errorMessage.textContent = "Please enter a valid date.";
+      // Function to move focus to the next input
+      function moveToNext(current, nextId) {
+        if (current.value.length === current.maxLength) {
+          document.getElementById(nextId).focus();
         }
-      });
+      }
 
-      // Helper function to validate the date format (YYYY-MM-DD)
-      function isValidDate(dateString) {
-        const datePattern = /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$/;
-        return datePattern.test(dateString);
+      // Function to validate the date
+      function validateDate() {
+        const mm = document.getElementById("mm").value;
+        const dd = document.getElementById("dd").value;
+        const yyyy = document.getElementById("yyyy").value;
+        const errorMessage = document.getElementById("error-message");
+
+        // Only validate if all fields are filled
+        if (mm.length === 2 && dd.length === 2 && yyyy.length === 4) {
+          const dateString = `${yyyy}-${mm}-${dd}`;
+          const date = new Date(dateString);
+
+          // Check if the date is valid
+          if (
+            date.getFullYear() === parseInt(yyyy, 10) &&
+            date.getMonth() + 1 === parseInt(mm, 10) &&
+            date.getDate() === parseInt(dd, 10)
+          ) {
+            errorMessage.style.display = "none"; // Hide error message
+            removeErrorStyles();
+          } else {
+            errorMessage.style.display = "block"; // Show error message
+            applyErrorStyles();
+          }
+        } else {
+          errorMessage.style.display = "none"; // Hide error message for incomplete inputs
+          removeErrorStyles();
+        }
+      }
+
+      // Apply error styles to inputs
+      function applyErrorStyles() {
+        document.getElementById("mm").classList.add("error");
+        document.getElementById("dd").classList.add("error");
+        document.getElementById("yyyy").classList.add("error");
+      }
+
+      // Remove error styles from inputs
+      function removeErrorStyles() {
+        document.getElementById("mm").classList.remove("error");
+        document.getElementById("dd").classList.remove("error");
+        document.getElementById("yyyy").classList.remove("error");
       }
     </script>
   </body>
