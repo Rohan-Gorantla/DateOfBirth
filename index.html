@@ -57,7 +57,7 @@
         id="mm"
         placeholder="MM"
         maxlength="2"
-        oninput="moveToNext(this, 'dd')"
+        oninput="this.value = this.value.replace(/[^0-9]/g, ''); moveToNext(this, 'dd')"
         onblur="validateDate()"
       />
       <input
@@ -65,15 +65,19 @@
         id="dd"
         placeholder="DD"
         maxlength="2"
-        oninput="moveToNext(this, 'yyyy')"
+        oninput="this.value = this.value.replace(/[^0-9]/g, ''); moveToNext(this, 'yyyy')"
         onblur="validateDate()"
+        pattern="([0-9]{2})"
+        onkeydown="handleBackspace(event, 'mm')"
       />
       <input
         type="text"
         id="yyyy"
         placeholder="YYYY"
         maxlength="4"
-        oninput="validateDate()"
+        pattern="([0-9]{4})"
+        oninput="this.value = this.value.replace(/[^0-9]/g, ''); validateDate()"
+        onkeydown="handleBackspace(event, 'dd')"
       />
     </div>
     <div id="error-message">Invalid date. Please enter a valid date.</div>
@@ -86,6 +90,13 @@
         }
       }
 
+      // Function to handle backspace behavior
+      function handleBackspace(event, previousId) {
+        if (event.key === "Backspace" && event.target.value === "") {
+          document.getElementById(previousId).focus();
+        }
+      }
+
       // Function to validate the date
       function validateDate() {
         const mm = document.getElementById("mm").value;
@@ -95,14 +106,56 @@
 
         // Only validate if all fields are filled
         if (mm.length === 2 && dd.length === 2 && yyyy.length === 4) {
+          // Check for valid month (01-12)
+          const month = parseInt(mm, 10);
+          if (month < 1 || month > 12) {
+            errorMessage.style.display = "block";
+            applyErrorStyles();
+            return;
+          }
+
+          // Check for valid day (01-31)
+          const day = parseInt(dd, 10);
+          if (day < 1 || day > 31) {
+            errorMessage.style.display = "block";
+            applyErrorStyles();
+            return;
+          }
+
+          // Handle specific days based on month
+          const daysInMonth = new Date(yyyy, month, 0).getDate();
+          if (day > daysInMonth) {
+            errorMessage.style.display = "block";
+            applyErrorStyles();
+            return;
+          }
+
+          // Check if the year is a valid 4-digit number between 1800 and current year
+          const year = parseInt(yyyy, 10);
+          const currentYear = new Date().getFullYear();
+          if (year < 1800 || year > currentYear) {
+            errorMessage.style.display = "block";
+            applyErrorStyles();
+            return;
+          }
+
+          // Check if the entered date is in the future
+          const today = new Date();
+          const enteredDate = new Date(`${yyyy}-${mm}-${dd}`);
+          if (enteredDate > today) {
+            errorMessage.style.display = "block";
+            applyErrorStyles();
+            return;
+          }
+
+          // If all conditions are met, consider it a valid date
           const dateString = `${yyyy}-${mm}-${dd}`;
           const date = new Date(dateString);
 
-          // Check if the date is valid
           if (
-            date.getFullYear() === parseInt(yyyy, 10) &&
-            date.getMonth() + 1 === parseInt(mm, 10) &&
-            date.getDate() === parseInt(dd, 10)
+            date.getFullYear() === year &&
+            date.getMonth() + 1 === month &&
+            date.getDate() === day
           ) {
             errorMessage.style.display = "none"; // Hide error message
             removeErrorStyles();
