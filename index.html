@@ -10,15 +10,35 @@
     <input
       type="date"
       id="dob"
+      name="dob"
+      formControlName="dob"
       max="9999-12-31"
       onfocus="this.blur();"
       required
     />
+    <span class="error-message" id="error-message"></span>
 
     <script>
-      document.querySelector("#dob").addEventListener("click", (event) => {
-        event.preventDefault();
+      const dobInput = document.querySelector("#dob");
+      const errorMessage = document.querySelector("#error-message");
+
+      // Allow manual input by enabling focus on the input
+      dobInput.addEventListener("input", (event) => {
+        const value = event.target.value;
+        if (isValidDate(value)) {
+          dobInput.classList.remove("error");
+          errorMessage.textContent = "";
+        } else {
+          dobInput.classList.add("error");
+          errorMessage.textContent = "Please enter a valid date.";
+        }
       });
+
+      // Helper function to validate the date format (YYYY-MM-DD)
+      function isValidDate(dateString) {
+        const datePattern = /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$/;
+        return datePattern.test(dateString);
+      }
     </script>
   </body>
 </html>
