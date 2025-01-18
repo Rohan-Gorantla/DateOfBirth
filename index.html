@@ -7,6 +7,18 @@
   </head>
   <body>
     <label for="dateInput">Enter Date:</label>
-    <input type="date" />
+    <input
+      type="date"
+      id="dob"
+      max="9999-12-31"
+      onfocus="this.blur();"
+      required
+    />
+
+    <script>
+      document.querySelector("#dob").addEventListener("click", (event) => {
+        event.preventDefault();
+      });
+    </script>
   </body>
 </html>
