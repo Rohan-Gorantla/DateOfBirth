@@ -48,6 +48,15 @@
       .error {
         border: 1px solid red;
       }
+
+      #vicky::-webkit-calendar-picker-indicator {
+        display: none; /* Hides the calendar icon */
+        -webkit-appearance: none; /* Ensures it doesn't show in WebKit-based browsers */
+      }
+
+      #vicky {
+        pointer-events: auto; /* Ensures manual input is still allowed */
+      }
     </style>
   </head>
   <body>
@@ -96,6 +105,14 @@
           <div id="combined-error" class="colortext"></div>
         </div>
       </form>
+    </div>
+
+    <div>
+      <input id="vicky" type="date" />
+    </div>
+
+    <div>
+      <input type="date" />
     </div>
 
     <script>
