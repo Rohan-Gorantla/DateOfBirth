@@ -20,6 +20,14 @@
           placeholder: "MM/DD/YYYY",
           clearMaskOnLostFocus: false, // Don't clear mask on lost focus
         });
+
+        // Reintroduce the keydown event to handle Backspace
+        $("#dateInput").on("keydown", function (e) {
+          if (e.key === "Backspace") {
+            this.value = ""; // Clear the input field
+            return; // Stop further processing
+          }
+        });
       });
     </script>
   </body>
