@@ -28,6 +28,34 @@
             return; // Stop further processing
           }
         });
+
+        // Reintroduce the input event for formatting
+        $("#dateInput").on("input", function () {
+          let value = this.value;
+          value = value.replace(/[^0-9/]/g, ""); // Allow only digits and slashes
+          let parts = value.split("/");
+
+          // Add leading zero to month if needed
+          if (parts[0] && parts[0].length === 1) {
+            parts[0] = "0" + parts[0]; // Add leading zero
+          }
+
+          // Add leading zero to day if needed
+          if (parts[1] && parts[1].length === 1) {
+            parts[1] = "0" + parts[1]; // Add leading zero
+          }
+
+          // Rebuild the value with the updated parts
+          let formattedValue = parts.join("/");
+
+          // Update the input value with the newly formatted value
+          this.value = formattedValue;
+
+          // Limit the value to a maximum of 10 characters (MM/DD/YYYY format)
+          if (this.value.length > 10) {
+            this.value = this.value.substring(0, 10);
+          }
+        });
       });
     </script>
   </body>
