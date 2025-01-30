@@ -29,40 +29,41 @@
           clearMaskOnLostFocus: false, // Don't clear mask on lost focus
         });
 
-        // Reintroduce the keydown event to handle Backspace
+        // Handle keydown event to allow backspace
         $("#dateInput").on("keydown", function (e) {
           if (e.key === "Backspace") {
             this.value = ""; // Clear the input field
             clearErrorMessages(); // Clear error messages when clearing the field
-            return; // Stop further processing
           }
         });
 
-        // Input event to check for invalid month and day
+        // Input event to validate date and ensure correct formatting (without formatting here)
         $("#dateInput").on("input", function () {
           let value = this.value.replace(/[^0-9/]/g, ""); // Remove non-numeric characters
-          let parts = value.split("/");
-
-          // Validate the full date
-          const errorMessage = validateDate(parts);
-
-          if (errorMessage) {
-            showError(errorMessage); // Show error message if invalid
+          
+          // Only validate when full date (MM/DD/YYYY) is entered
+          if (this.value.length === 10) {
+            const errorMessage = validateDate(value);
+            if (errorMessage) {
+              showError(errorMessage); // Show error message if invalid
+            } else {
+              clearErrorMessages(); // Clear error message if valid
+            }
           } else {
-            clearErrorMessages(); // Clear error message if valid
+            clearErrorMessages(); // Clear error message if the date is not fully entered yet
           }
+        });
 
-          // Update the input value with the formatted date (if valid)
-          this.value = parts.join("/");
+        // Blur event to format the input after the user finishes typing
+        $("#dateInput").on("blur", function () {
+          this.value = formatInput(this.value); // Format the value once the user finishes typing
         });
 
         // Date Validation Function
-        function validateDate(parts) {
-          if (parts.length !== 3) return "Invalid date format. Use MM/DD/YYYY."; // Ensure we have month, day, and year
-
-          const month = parseInt(parts[0]);
-          const day = parseInt(parts[1]);
-          const year = parseInt(parts[2]);
+        function validateDate(value) {
+          const month = parseInt(value.substring(0, 2));
+          const day = parseInt(value.substring(3, 5));
+          const year = parseInt(value.substring(6, 10));
 
           // Check if month is valid (1-12)
           if (isNaN(month) || month < 1 || month > 12) {
@@ -101,6 +102,23 @@
 
           // Check if the day is valid for the given month and year
           return day <= daysInMonth[month - 1];
+        }
+
+        // Function to format the input string to MM/DD/YYYY
+        function formatInput(value) {
+          // Limit the string to a maximum of 10 characters
+          value = value.substring(0, 10);
+
+          // Format the month and day with leading zeros if necessary
+          if (value.length >= 2) {
+            value = value.substring(0, 2) + '/' + value.substring(2);
+          }
+
+          if (value.length >= 5) {
+            value = value.substring(0, 5) + '/' + value.substring(5);
+          }
+
+          return value;
         }
 
         // Function to show error message
