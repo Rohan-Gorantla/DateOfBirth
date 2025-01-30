@@ -3,180 +3,74 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Date of Birth</title>
-    <style>
-      body {
-        font-family: Arial, sans-serif;
-        margin: 20px;
-      }
-
-      .form-container {
-        max-width: 350px;
-        margin: 0 auto;
-      }
-
-      .form-group {
-        margin-bottom: 15px;
-      }
-
-      .form-group label {
-        font-weight: bold;
-      }
-
-      .inputs {
-        display: flex;
-        justify-content: space-between;
-      }
-
-      .inputs input {
-        width: 30%;
-        padding: 5px;
-        margin-right: 5px;
-        text-align: center;
-      }
-
-      .inputs input:last-child {
-        margin-right: 0;
-      }
-
-      .colortext {
-        color: red;
-        font-size: 12px;
-        margin-top: 5px;
-      }
-
-      .error {
-        border: 1px solid red;
-      }
-
-      #vicky::-webkit-calendar-picker-indicator {
-        display: none; /* Hides the calendar icon */
-        -webkit-appearance: none; /* Ensures it doesn't show in WebKit-based browsers */
-      }
-
-      #vicky {
-        pointer-events: auto; /* Ensures manual input is still allowed */
-      }
-    </style>
+    <title>Date Input Auto-Format</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.inputmask/5.0.7-beta.19/jquery.inputmask.min.js"></script>
   </head>
   <body>
-    <div class="form-container">
-      <form id="dob-form">
-        <div class="form-group">
-          <label for="dob">Date of Birth</label>
-
-          <div class="inputs">
-            <!-- MM Input -->
-            <input
-              type="text"
-              id="mm"
-              placeholder="MM"
-              maxlength="2"
-              oninput="updateDate()"
-              onblur="updateDate()"
-              class="vinput date-input"
-            />
-            <!-- DD Input -->
-            <input
-              type="text"
-              id="dd"
-              placeholder="DD"
-              maxlength="2"
-              oninput="updateDate()"
-              onblur="updateDate()"
-              class="vinput date-input"
-            />
-            <!-- YYYY Input -->
-            <input
-              type="text"
-              id="yyyy"
-              placeholder="YYYY"
-              maxlength="4"
-              oninput="updateDate()"
-              onblur="updateDate()"
-              class="vinput date-input"
-            />
-          </div>
-
-          <!-- Error Messages -->
-          <div id="mm-error" class="colortext"></div>
-          <div id="dd-error" class="colortext"></div>
-          <div id="yyyy-error" class="colortext"></div>
-          <div id="combined-error" class="colortext"></div>
-        </div>
-      </form>
-    </div>
-
-    <div>
-      <input id="vicky" type="date" />
-    </div>
-
-    <div>
-      <input type="date" />
-    </div>
+    <label for="dateInput">Enter Date (MM/DD/YYYY):</label>
+    <input type="text" id="dateInput" placeholder="MM/DD/YYYY" maxlength="10" />
 
     <script>
-      function updateDate() {
-        const mm = document.getElementById("mm").value;
-        const dd = document.getElementById("dd").value;
-        const yyyy = document.getElementById("yyyy").value;
+      $(document).ready(function () {
+        // Apply InputMask for MM/DD/YYYY format
+        $("#dateInput").inputmask("99/99/9999", {
+          showMaskOnHover: false,
+          placeholder: "MM/DD/YYYY", // Set placeholder as "MM/DD/YYYY"
+          clearMaskOnLostFocus: false, // Don't clear mask on lost focus
+        });
 
-        const currentYear = new Date().getFullYear();
-        const dateString = `${yyyy}-${mm}-${dd}`;
-        const enteredDate = new Date(dateString);
+        // Handling the keydown event to detect backspace
+        $("#dateInput").on("keydown", function (e) {
+          // Check if backspace key is pressed (keyCode 8)
+          if (e.key === "Backspace") {
+            this.value = ""; // Clear the input field
+            return; // Stop further processing
+          }
+        });
 
-        // Clear previous error messages
-        document.getElementById("mm-error").innerText = "";
-        document.getElementById("dd-error").innerText = "";
-        document.getElementById("yyyy-error").innerText = "";
-        document.getElementById("combined-error").innerText = "";
+        // Handling the input event for formatting
+        $("#dateInput").on("input", function () {
+          let value = this.value;
 
-        // Check if all parts have been entered and have valid lengths
-        if (mm.length === 2 && dd.length === 2 && yyyy.length === 4) {
-          const month = parseInt(mm, 10);
-          const day = parseInt(dd, 10);
-          const year = parseInt(yyyy, 10);
+          // Remove any non-numeric characters (we only want digits and slashes)
+          value = value.replace(/[^0-9/]/g, "");
 
-          // Check for valid month (01-12)
-          if (month < 1 || month > 12) {
-            document.getElementById("mm-error").innerText =
-              "Invalid month. Please enter a value between 01 and 12.";
-            return;
+          // Split the value into month, day, and year parts
+          let parts = value.split("/");
+
+          // Add leading zero to month if needed
+          if (
+            parts[0] &&
+            parts[0].length === 1 &&
+            parseInt(parts[0]) >= 2 &&
+            parseInt(parts[0]) <= 9
+          ) {
+            parts[0] = "0" + parts[0]; // Add leading zero
           }
 
-          // Check for valid day (01-31)
-          if (day < 1 || day > 31) {
-            document.getElementById("dd-error").innerText =
-              "Invalid day. Please enter a valid day for the given month.";
-            return;
+          // Add leading zero to day if needed
+          if (
+            parts[1] &&
+            parts[1].length === 1 &&
+            parseInt(parts[1]) >= 4 &&
+            parseInt(parts[1]) <= 9
+          ) {
+            parts[1] = "0" + parts[1]; // Add leading zero
           }
 
-          // Handle specific days based on month
-          const daysInMonth = new Date(year, month, 0).getDate();
-          if (day > daysInMonth) {
-            document.getElementById("dd-error").innerText =
-              "Invalid day. Please enter a valid day for the given month.";
-            return;
-          }
+          // Rebuild the value with the updated parts
+          let formattedValue = parts.join("/");
 
-          // Check if the year is a valid 4-digit number between 1800 and current year
-          if (year < 1800 || year > currentYear) {
-            document.getElementById("yyyy-error").innerText =
-              "Invalid year. Please enter a valid year greater than 1800.";
-            return;
-          }
+          // Update the input value with the newly formatted value
+          this.value = formattedValue;
 
-          // Check if the entered date is in the future
-          if (enteredDate > new Date()) {
-            document.getElementById("combined-error").innerText =
-              "Please enter a date in the past (not a future date).";
-            return;
+          // Limit the value to a maximum of 10 characters (MM/DD/YYYY format)
+          if (this.value.length > 10) {
+            this.value = this.value.substring(0, 10);
           }
-
-          // If all validations pass, set the combined date
-          document.getElementById("combined-error").innerText = ""; // Clear any previous combined errors
-        }
-      }
+        });
+      });
     </script>
   </body>
 </html>
