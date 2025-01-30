@@ -6,10 +6,18 @@
     <title>Date Input Auto-Format</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.inputmask/5.0.7-beta.19/jquery.inputmask.min.js"></script>
+    <style>
+      .error {
+        color: red;
+        font-size: 12px;
+        margin-top: 5px;
+      }
+    </style>
   </head>
   <body>
     <label for="dateInput">Enter Date (MM/DD/YYYY):</label>
     <input type="text" id="dateInput" placeholder="MM/DD/YYYY" maxlength="10" />
+    <div id="errorMessages" class="error"></div>
 
     <script>
       $(document).ready(function () {
@@ -25,9 +33,85 @@
         $("#dateInput").on("keydown", function (e) {
           if (e.key === "Backspace") {
             this.value = ""; // Clear the input field
+            clearErrorMessages(); // Clear error messages when clearing the field
             return; // Stop further processing
           }
         });
+
+        // Input event to check for invalid month and day
+        $("#dateInput").on("input", function () {
+          let value = this.value.replace(/[^0-9/]/g, ""); // Remove non-numeric characters
+          let parts = value.split("/");
+
+          // Validate the full date
+          const errorMessage = validateDate(parts);
+
+          if (errorMessage) {
+            showError(errorMessage); // Show error message if invalid
+          } else {
+            clearErrorMessages(); // Clear error message if valid
+          }
+
+          // Update the input value with the formatted date (if valid)
+          this.value = parts.join("/");
+        });
+
+        // Date Validation Function
+        function validateDate(parts) {
+          if (parts.length !== 3) return "Invalid date format. Use MM/DD/YYYY."; // Ensure we have month, day, and year
+
+          const month = parseInt(parts[0]);
+          const day = parseInt(parts[1]);
+          const year = parseInt(parts[2]);
+
+          // Check if month is valid (1-12)
+          if (isNaN(month) || month < 1 || month > 12) {
+            return "Invalid month. Month must be between 01 and 12.";
+          }
+
+          // Check if day is valid for the given month
+          if (isNaN(day) || day < 1 || day > 31) {
+            return "Invalid day. Day must be between 01 and 31.";
+          }
+
+          // Validate the day for the given month and year (including leap year validation)
+          if (!isValidDayForMonth(month, day, year)) {
+            return `Invalid day for month ${month}. Please check the number of days in the month.`;
+          }
+
+          // If everything is valid
+          return null; // No error
+        }
+
+        // Helper function to check if day is valid for the given month and year
+        function isValidDayForMonth(month, day, year) {
+          const daysInMonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]; // Days for each month (ignores leap years for simplicity)
+
+          // Leap year check: a year is a leap year if:
+          // 1. It is divisible by 4, and
+          // 2. (It is not divisible by 100, unless it is divisible by 400)
+          function isLeapYear(year) {
+            return (year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0));
+          }
+
+          // Handle leap year for February (month 2)
+          if (month === 2 && isLeapYear(year)) {
+            daysInMonth[1] = 29; // February has 29 days in a leap year
+          }
+
+          // Check if the day is valid for the given month and year
+          return day <= daysInMonth[month - 1];
+        }
+
+        // Function to show error message
+        function showError(message) {
+          $("#errorMessages").text(message); // Display the error message
+        }
+
+        // Function to clear error messages
+        function clearErrorMessages() {
+          $("#errorMessages").text(""); // Clear the error message
+        }
       });
     </script>
   </body>
