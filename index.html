@@ -1,35 +1,37 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Date Input Mask</title>
-  <!-- Include Inputmask library -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/inputmask/5.0.6-beta.17/inputmask.min.js"></script>
-</head>
-<body>
-  <label for="dateInput">Enter Date (MM/DD/YYYY):</label>
-  <input type="text" id="dateInput" placeholder="MM/DD/YYYY" />
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Date Input Mask</title>
+    <!-- Include Inputmask library from a reliable CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/inputmask@5.0.7/dist/inputmask.min.js"></script>
+  </head>
+  <body>
+    <label for="dateInput">Enter Date (MM/DD/YYYY):</label>
+    <input type="text" id="dateInput" placeholder="MM/DD/YYYY" />
 
-  <script>
-    const dateInput = document.getElementById('dateInput') as HTMLInputElement;
+    <script>
+      const dateInput = document.getElementById("dateInput");
 
-    if (dateInput) {
-      // Apply Inputmask for MM/DD/YYYY format
-      new Inputmask('99/99/9999', {
-        placeholder: 'MM/DD/YYYY',  // Retain placeholder
-        showMaskOnHover: false,
-        clearMaskOnLostFocus: false, // Retain behavior of mask not clearing on focus loss
-        showMaskOnFocus: true,       // Show mask when input is focused (better for mobile)
-      }).mask(dateInput);
+      if (dateInput) {
+        // Apply Inputmask for MM/DD/YYYY format
+        const inputmask = new Inputmask("99/99/9999", {
+          placeholder: "MM/DD/YYYY", // Retain placeholder
+          showMaskOnHover: false,
+          clearMaskOnLostFocus: false, // Retain behavior of mask not clearing on focus loss
+          showMaskOnFocus: true, // Show mask when input is focused (better for mobile)
+        });
 
-      // Handle keydown event to allow backspace
-      dateInput.addEventListener('keydown', (e) => {
-        if (e.key === 'Backspace') {
-          dateInput.value = ''; // Clear the input field on backspace
-        }
-      });
-    }
-  </script>
-</body>
+        inputmask.mask(dateInput);
+
+        // Handle keydown event to allow backspace
+        dateInput.addEventListener("keydown", (e) => {
+          if (e.key === "Backspace") {
+            dateInput.value = ""; // Clear the input field on backspace
+          }
+        });
+      }
+    </script>
+  </body>
 </html>
