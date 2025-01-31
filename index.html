@@ -18,6 +18,7 @@
       // Apply Inputmask for MM/DD/YYYY format
       new Inputmask('99/99/9999', {
         placeholder: 'MM/DD/YYYY',  // Retain placeholder
+        showMaskOnHover: false,
         clearMaskOnLostFocus: false, // Retain behavior of mask not clearing on focus loss
         showMaskOnFocus: true,       // Show mask when input is focused (better for mobile)
       }).mask(dateInput);
