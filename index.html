@@ -19,6 +19,8 @@
         const inputmask = new Inputmask("99/99/9999", {
           placeholder: "MM/DD/YYYY", // Retain placeholder
           showMaskOnHover: false,
+          autoUnmask: true,
+          showMaskOnFocus: true,
           clearMaskOnLostFocus: false, // Retain behavior of mask not clearing on focus loss
         });
 
