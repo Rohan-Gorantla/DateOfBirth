@@ -66,12 +66,12 @@
           const year = parseInt(value.substring(6, 10));
 
           // Check if month is valid (1-12)
-          if (isNaN(month) || month < 1 || month > 12 || month) {
+          if (isNaN(month) || month < 1 || month > 12) {
             return "Invalid month. Month must be between 01 and 12.";
           }
 
           // Check if day is valid for the given month
-          if (isNaN(day) || day < 1 || day > 31 || day) {
+          if (isNaN(day) || day < 1 || day > 31) {
             return "Invalid day. Day must be between 01 and 31.";
           }
 
