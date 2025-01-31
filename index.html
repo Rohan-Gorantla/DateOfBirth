@@ -1,136 +1,34 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Date Input Auto-Format</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.inputmask/5.0.7-beta.19/jquery.inputmask.min.js"></script>
-    <style>
-      .error {
-        color: red;
-        font-size: 12px;
-        margin-top: 5px;
-      }
-    </style>
-  </head>
-  <body>
-    <label for="dateInput">Enter Date (MM/DD/YYYY):</label>
-    <input type="text" id="dateInput" placeholder="MM/DD/YYYY" maxlength="10" />
-    <div id="errorMessages" class="error"></div>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Date Input Mask</title>
+  <!-- Include Inputmask library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/inputmask/5.0.6-beta.17/inputmask.min.js"></script>
+</head>
+<body>
+  <label for="dateInput">Enter Date (MM/DD/YYYY):</label>
+  <input type="text" id="dateInput" placeholder="MM/DD/YYYY" />
 
-    <script>
-      $(document).ready(function () {
-        // Apply InputMask for MM/DD/YYYY format
-        $("#dateInput").inputmask({
-          mask: "99/99/9999",
-          showMaskOnHover: false,
-          placeholder: "MM/DD/YYYY", // Show placeholder text
-          clearMaskOnLostFocus: false, // Don't clear mask on lost focus
-        });
+  <script>
+    const dateInput = document.getElementById('dateInput') as HTMLInputElement;
 
-        // Handle keydown event to allow backspace
-        $("#dateInput").on("keydown", function (e) {
-          if (e.key === "Backspace") {
-            this.value = ""; // Clear the input field
-            clearErrorMessages(); // Clear error messages when clearing the field
-          }
-        });
+    if (dateInput) {
+      // Apply Inputmask for MM/DD/YYYY format
+      new Inputmask('99/99/9999', {
+        placeholder: 'MM/DD/YYYY',  // Retain placeholder
+        clearMaskOnLostFocus: false, // Retain behavior of mask not clearing on focus loss
+        showMaskOnFocus: true,       // Show mask when input is focused (better for mobile)
+      }).mask(dateInput);
 
-        // Input event to validate date and ensure correct formatting (without formatting here)
-        $("#dateInput").on("input", function () {
-          let value = this.value.replace(/[^0-9/]/g, ""); // Remove non-numeric characters
-          
-          // Only validate when full date (MM/DD/YYYY) is entered
-          if (this.value.length === 10) {
-            const errorMessage = validateDate(value);
-            if (errorMessage) {
-              showError(errorMessage); // Show error message if invalid
-            } else {
-              clearErrorMessages(); // Clear error message if valid
-            }
-          } else {
-            clearErrorMessages(); // Clear error message if the date is not fully entered yet
-          }
-        });
-
-        // Blur event to format the input after the user finishes typing
-        $("#dateInput").on("blur", function () {
-          this.value = formatInput(this.value); // Format the value once the user finishes typing
-        });
-
-        // Date Validation Function
-        function validateDate(value) {
-          const month = parseInt(value.substring(0, 2));
-          const day = parseInt(value.substring(3, 5));
-          const year = parseInt(value.substring(6, 10));
-
-          // Check if month is valid (1-12)
-          if (isNaN(month) || month < 1 || month > 12) {
-            return "Invalid month. Month must be between 01 and 12.";
-          }
-
-          // Check if day is valid for the given month
-          if (isNaN(day) || day < 1 || day > 31) {
-            return "Invalid day. Day must be between 01 and 31.";
-          }
-
-          // Validate the day for the given month and year (including leap year validation)
-          if (!isValidDayForMonth(month, day, year)) {
-            return `Invalid day for month ${month}. Please check the number of days in the month.`;
-          }
-
-          // If everything is valid
-          return null; // No error
-        }
-
-        // Helper function to check if day is valid for the given month and year
-        function isValidDayForMonth(month, day, year) {
-          const daysInMonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]; // Days for each month (ignores leap years for simplicity)
-
-          // Leap year check: a year is a leap year if:
-          // 1. It is divisible by 4, and
-          // 2. (It is not divisible by 100, unless it is divisible by 400)
-          function isLeapYear(year) {
-            return (year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0));
-          }
-
-          // Handle leap year for February (month 2)
-          if (month === 2 && isLeapYear(year)) {
-            daysInMonth[1] = 29; // February has 29 days in a leap year
-          }
-
-          // Check if the day is valid for the given month and year
-          return day <= daysInMonth[month - 1];
-        }
-
-        // Function to format the input string to MM/DD/YYYY
-        function formatInput(value) {
-          // Limit the string to a maximum of 10 characters
-          value = value.substring(0, 10);
-
-          // Format the month and day with leading zeros if necessary
-          if (value.length >= 2) {
-            value = value.substring(0, 2) + '/' + value.substring(2);
-          }
-
-          if (value.length >= 5) {
-            value = value.substring(0, 5) + '/' + value.substring(5);
-          }
-
-          return value;
-        }
-
-        // Function to show error message
-        function showError(message) {
-          $("#errorMessages").text(message); // Display the error message
-        }
-
-        // Function to clear error messages
-        function clearErrorMessages() {
-          $("#errorMessages").text(""); // Clear the error message
+      // Handle keydown event to allow backspace
+      dateInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Backspace') {
+          dateInput.value = ''; // Clear the input field on backspace
         }
       });
-    </script>
-  </body>
+    }
+  </script>
+</body>
 </html>
